@@ -6,7 +6,7 @@ st.set_page_config(page_title="Tyrannus Technik-Bot", page_icon="🎛️")
 
 # Logo anzeigen (falls vorhanden)
 try:
-    st.image("svt_logo.png", width=300)
+    st.image("svt_logo.jpg", width=300)
 except FileNotFoundError:
     pass # Kein Fehler anzeigen, einfach weitermachen
 
