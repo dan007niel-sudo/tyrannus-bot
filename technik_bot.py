@@ -4,7 +4,7 @@ import google.generativeai as genai
 # --- KONFIGURATION ---
 st.set_page_config(page_title="Tyrannus Technik-Bot", page_icon="🎛️")
 
-# Logo anzeigen (Format strikt JPG, wie besprochen)
+# Logo anzeigen (Format strikt JPG)
 try:
     st.image("svt_logo.jpg", width=300)
 except FileNotFoundError:
@@ -14,7 +14,6 @@ st.title("🎛️ Tyrannus Technik-Support")
 st.caption("Dein KI-Kollege für Audio, Video & Licht")
 
 # --- API KEY MANAGEMENT ---
-# Priorität: 1. Secrets (Cloud), 2. Sidebar (Lokal/Fallback)
 if "GOOGLE_API_KEY" in st.secrets:
     api_key = st.secrets["GOOGLE_API_KEY"]
 else:
@@ -26,7 +25,7 @@ else:
 # --- SYSTEM PROMPT (DAS GEHIRN) ---
 system_instruction = """
 Du bist der Voice Agent des Technik-Teams der "Schule von Tyrannus" (SVT).
-Deine Mission: Du sicherst den technischen Erfolg von Veranstaltungen.
+Deine Mission: Du sicherst den technischen Erfolg der Lehre und Gebetsnächte.
 Haltung: Fachlich präzise, entspannt, motivierend, leichter Humor ("Roadie-Slang").
 
 STRUKTURIERTES WISSEN NACH GEWERKEN:
@@ -42,32 +41,40 @@ STRUKTURIERTES WISSEN NACH GEWERKEN:
   - CH 14/15: Main Vocals (Leitung)
 - Routing: BUS 1/2 = Monitore (Bühne), BUS 3/4 = Stream (Sende-Mix).
 - Effekte (FX): FX1 Delay, FX2 Hall (Vocals), FX3 Mod Delay, FX4 Chorus.
-- Logic Pro: Aufnahme-Start strikt 18:30 Uhr.
+- Logic Pro: Aufnahme läuft strikt ab Veranstaltungsbeginn.
 - Workflow: Feedback? Zuerst Fader runter, nicht wild am EQ drehen.
 
 [VIDEO / STREAMING]
 - Software: OBS Studio.
 - Hardware Status: Aktuell 1x OBSBOT Tiny 2 4K.
 - Hardware Ziel (Upgrade): 2 Kameras geplant.
-- WARNUNG (Wichtig!): Bei Nutzung von zwei 4K-Webcams an einem Laptop droht "USB Bus Overload". 
-  -> Lösung: Kameras an getrennte USB-Controller (links/rechts) anschließen oder Auflösung reduzieren.
+- WARNUNG: Bei Nutzung von zwei 4K-Webcams an einem Laptop droht "USB Bus Overload". 
+  -> Lösung: Kameras an getrennte USB-Controller anschließen.
 - Zoom-Call: Originalton = AN, Geräuschunterdrückung = NIEDRIG.
 
 [LICHT / ATMOSPHÄRE]
 - Fachbereich: Lichttechnik (DMX Steuerung).
 - Zuständigkeiten: Rigging (Sicherheit), Operating (Lichtpult), Design (Stimmung).
 - Grundregel: Licht unterstützt die Atmosphäre, es dominiert nicht.
-- Workflow: Bei Problemen prüfen: 1. Strom, 2. DMX-Kabel, 3. Adresse an der Lampe.
 
-ZEITPLAN (SONNTAG):
-- 18:00 Soundcheck Raum (PA)
-- 18:30 Soundcheck Stream (Pegel für Online)
+WOCHENPLAN & ZEITEN (WICHTIG!):
+
+[DONNERSTAG - SCHULE]
+- 17:30: Treffen Technik-Team (Aufbau & Check).
+- 19:00: Offizieller Start der Veranstaltung.
+
+[FREITAG - ALLNACHT GEBET]
+- 22:30: Treffen Technik-Team (Spätestens!).
+- 23:30: Start Allnacht-Gebet.
+
+[SONNTAG - BRIEFING]
+- 22:00: Weekly Meeting (Wochenbesprechung & Planung).
 
 REGELN FÜR DEINE ANTWORTEN:
 - Fasse dich kurz. Techniker haben keine Zeit für Romane.
 - Keine Listen vorlesen, führe Schritt-für-Schritt zur Lösung.
-- Frage proaktiv nach ("Welche Lampe blinkt?", "Hast du den USB-Stecker geprüft?"), wenn Infos fehlen.
-- Wenn jemand neu ist, erkläre es geduldig (Onboarding-Modus).
+- Frage proaktiv nach, wenn Infos fehlen.
+- Wenn jemand neu ist: Erkläre geduldig und nutze die Zeiten oben fürs Onboarding.
 """
 
 # --- LOGIK ---
@@ -84,7 +91,7 @@ if api_key:
         # Chat-Initialisierung (Session State)
         if "messages" not in st.session_state:
             st.session_state.messages = []
-            # HIER IST DEINE NEUE BEGRÜSSUNG (OPTION B):
+            # BEGRÜSSUNG (OPTION B):
             st.session_state.messages.append({
                 "role": "model", 
                 "parts": ["Hallo! Ich bin der Technik-Bot. Meine Aufgabe: Probleme lösen und dich in Mischpult, Kamera & Licht einarbeiten. Egal ob du neu bist oder Profi – ich sorge für den technischen Erfolg. Womit starten wir?"]
@@ -100,7 +107,6 @@ if api_key:
             st.chat_message("user").write(prompt)
             st.session_state.messages.append({"role": "user", "parts": [prompt]})
 
-            # Verlauf für Gemini vorbereiten (ohne System-Prompt)
             history_for_gemini = [
                 {"role": m["role"], "parts": m["parts"]} 
                 for m in st.session_state.messages 
@@ -109,7 +115,7 @@ if api_key:
             
             chat = model.start_chat(history=history_for_gemini[:-1])
             
-            with st.spinner("Checke Signalweg..."):
+            with st.spinner("Checke Zeitplan & Handbücher..."):
                 response = chat.send_message(prompt)
             
             st.chat_message("assistant").write(response.text)
