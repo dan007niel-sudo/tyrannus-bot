@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- SVT DESIGN SYSTEM (STABIL) ---
+# --- SVT DESIGN SYSTEM (FINAL & BUGFIXED) ---
 st.markdown("""
     <style>
     /* 1. GRUNDLAGE: Weißer Hintergrund */
@@ -17,6 +17,7 @@ st.markdown("""
     }
     
     /* 2. TEXT-FARBE (Global Schwarz) */
+    /* Wir setzen Text global auf Schwarz, aber schließen Icons aus */
     .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp li, .stApp span, .stApp div, .stApp label, .stMarkdown {
         color: #000000 !important; 
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
@@ -62,9 +63,10 @@ st.markdown("""
         background-color: #ffffff !important;
         border: 1px solid #ccc !important;
     }
+    
+    /* HIER WAR DER FIX: Keine erzwungene Textfarbe, damit Icons funktionieren */
     .stChatMessage {
         background-color: #f8f9fa !important;
-        color: #000000 !important;
         border: 1px solid #e0e0e0;
         border-radius: 8px;
     }
