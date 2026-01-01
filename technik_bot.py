@@ -8,15 +8,15 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- SVT DESIGN SYSTEM (NOTFALL-FIX: BUTTON TEXT FARBE) ---
+# --- SVT DESIGN SYSTEM (STABIL) ---
 st.markdown("""
     <style>
-    /* 1. GRUNDLAGE: Zwinge alles auf Weißer Hintergrund */
+    /* 1. GRUNDLAGE: Weißer Hintergrund */
     .stApp {
         background-color: #ffffff !important;
     }
     
-    /* 2. TEXT-FARBE & SCHRIFT (Global, außer Buttons) */
+    /* 2. TEXT-FARBE (Global Schwarz) */
     .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp li, .stApp span, .stApp div, .stApp label, .stMarkdown {
         color: #000000 !important; 
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
@@ -31,44 +31,32 @@ st.markdown("""
         color: #1c1c1c !important;
     }
 
-    /* 4. BUTTONS (DER FIX: TEXT MIT VORSCHLAGHAMMER AUF WEISS) */
+    /* 4. BUTTONS (SCHWARZ MIT WEISSER SCHRIFT) */
     .stButton > button {
         background-color: #000000 !important;
         border: 2px solid #000000 !important;
         border-radius: 4px !important;
         transition: all 0.2s ease;
-        /* HIER IST DER FIX: Farbe für den Button selbst setzen */
-        color: #ffffff !important; 
     }
-    /* UND HIER NOCHMAL: Zwinge JEDES Element im Button auf WEISS */
+    
+    /* WICHTIG: Text im Button MUSS weiß sein */
     .stButton > button * {
-        color: #ffffff !important; 
+        color: #ffffff !important;
         font-weight: 700 !important;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
     
-    /* Hover: Invertieren (Schwarz auf Weiß) */
+    /* Hover: Invertieren (Weißer Button, Schwarzer Text) */
     .stButton > button:hover {
         background-color: #ffffff !important;
         border: 2px solid #000000 !important;
-        color: #000000 !important;
     }
     .stButton > button:hover * {
         color: #000000 !important;
     }
 
-    /* 5. EXPANDER & INPUTS */
-    .streamlit-expanderHeader {
-        background-color: #f4f4f4 !important;
-        color: #000000 !important;
-        border: 1px solid #ddd;
-    }
-    .streamlit-expanderContent {
-        background-color: #ffffff !important;
-        border: 1px solid #ddd;
-        border-top: none;
-    }
+    /* 5. INPUTS & CHAT */
     .stTextInput input {
         color: #000000 !important;
         background-color: #ffffff !important;
@@ -110,7 +98,7 @@ def check_password():
 if not check_password():
     st.stop()
 
-# --- 4. SIDEBAR (Desktop Fokus) ---
+# --- 4. SIDEBAR ---
 with st.sidebar:
     try:
         st.image("svt_logo.jpg", use_container_width=True)
@@ -142,18 +130,9 @@ with st.sidebar:
     else:
         api_key = st.text_input("🔑 API Key", type="password")
 
-# --- 5. HAUPTBEREICH (Mobile Friendly) ---
+# --- 5. MODUS-AUSWAHL ---
 if st.session_state.mode is None:
     st.title("🎛️ TECHNIK-CENTER")
-    
-    # --- MOBILE LÖSUNG: Wochenplan als Ausklapp-Menü ---
-    with st.expander("📅 WOCHENPLAN ANZEIGEN (HIER KLICKEN)", expanded=False):
-        st.markdown("""
-        **DONNERSTAG (Schule):** 17:30 Aufbau | 19:00 Start  
-        **FREITAG (Allnacht):** 22:30 Treffen | 23:30 Start  
-        **SONNTAG (Briefing):** 22:00 Weekly Call
-        """)
-
     st.markdown("##### WÄHLE DEINEN EINSATZBEREICH")
     st.write("---")
     
@@ -261,13 +240,10 @@ final_system_prompt = base_knowledge + "\n" + mode_instruction
 # --- 7. CHAT LOGIK ---
 st.title(f"TECHNIK-BOT: {st.session_state.mode.upper()}")
 
-if st.session_state.mode == "live":
-     with st.expander("🆘 SCHNELLER NOTFALL-PLAN (STROM)", expanded=False):
-         st.warning("AN: Mixer -> Boxen | AUS: Boxen -> Mixer")
-
 if api_key:
     genai.configure(api_key=api_key)
     
+    # WICHTIG: Verwende 'gemini-flash-latest' für Stabilität
     model = genai.GenerativeModel(
         model_name="gemini-flash-latest", 
         system_instruction=final_system_prompt
