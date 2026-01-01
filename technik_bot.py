@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- SVT DESIGN SYSTEM (FIX: BUTTON TEXT EXTREM FORCIEREN) ---
+# --- SVT DESIGN SYSTEM (MOBILE OPTIMIZED) ---
 st.markdown("""
     <style>
     /* 1. GRUNDLAGE: Zwinge alles auf Weißer Hintergrund */
@@ -16,13 +16,13 @@ st.markdown("""
         background-color: #ffffff !important;
     }
     
-    /* 2. GLOBALE TEXT-FARBE: SCHWARZ (Das ist die Regel, die Probleme machte) */
-    /* Wir wenden das auf den Haupt-Content an, aber schließen Buttons aus */
+    /* 2. TEXT-FARBE & SCHRIFT */
     .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp li, .stApp span, .stApp div, .stApp label, .stMarkdown {
         color: #000000 !important; 
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
     }
 
-    /* 3. SIDEBAR SPEZIFISCH */
+    /* 3. SIDEBAR */
     section[data-testid="stSidebar"] {
         background-color: #f4f4f4 !important;
         border-right: 1px solid #ddd;
@@ -31,41 +31,55 @@ st.markdown("""
         color: #1c1c1c !important;
     }
 
-    /* 4. BUTTONS - DER WICHTIGE FIX */
-    /* Container Styling */
+    /* 4. BUTTONS (WEISSER TEXT AUF SCHWARZ) */
     .stButton > button {
         background-color: #000000 !important;
         border: 2px solid #000000 !important;
         border-radius: 4px !important;
+        transition: all 0.2s ease;
     }
-
-    /* TEXT IM BUTTON: Zwinge JEDES Element im Button auf WEISS */
+    /* Zwinge Text im Button auf Weiß */
     .stButton > button * {
         color: #ffffff !important; 
         font-weight: 700 !important;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
-    /* HOVER EFFEKT: Invertieren */
+    /* Hover: Invertieren */
     .stButton > button:hover {
         background-color: #ffffff !important;
         border: 2px solid #000000 !important;
     }
-    /* Beim Hovern muss der Text SCHWARZ werden */
     .stButton > button:hover * {
         color: #000000 !important;
     }
 
-    /* 5. INPUT FELDER & CHAT */
+    /* 5. EXPANDER (Mobile Wochenplan Styling) */
+    .streamlit-expanderHeader {
+        background-color: #f4f4f4 !important;
+        color: #000000 !important;
+        border-radius: 4px;
+        font-weight: bold;
+        border: 1px solid #ddd;
+    }
+    .streamlit-expanderContent {
+        background-color: #ffffff !important;
+        border: 1px solid #ddd;
+        border-top: none;
+    }
+
+    /* 6. INPUT & CHAT */
     .stTextInput input {
         color: #000000 !important;
         background-color: #ffffff !important;
         border: 1px solid #ccc !important;
     }
     .stChatMessage {
-        background-color: #f0f0f0 !important;
+        background-color: #f8f9fa !important;
         color: #000000 !important;
-        border: 1px solid #eee;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -74,7 +88,30 @@ st.markdown("""
 if "mode" not in st.session_state:
     st.session_state.mode = None 
 
-# --- 3. SIDEBAR ---
+# --- 3. SICHERHEITSSCHLEUSE (PASSWORT) ---
+def check_password():
+    """Fragt das Passwort ab."""
+    def password_entered():
+        if st.session_state["password"] == "SVT2026": 
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]
+        else:
+            st.session_state["password_correct"] = False
+
+    if "password_correct" not in st.session_state:
+        st.text_input("🔒 TEAM-LOGIN: Passwort", type="password", on_change=password_entered, key="password")
+        return False
+    elif not st.session_state["password_correct"]:
+        st.text_input("🔒 TEAM-LOGIN: Passwort", type="password", on_change=password_entered, key="password")
+        st.error("Zugriff verweigert.")
+        return False
+    else:
+        return True
+
+if not check_password():
+    st.stop()
+
+# --- 4. SIDEBAR (Desktop Fokus) ---
 with st.sidebar:
     try:
         st.image("svt_logo.jpg", use_container_width=True)
@@ -106,15 +143,24 @@ with st.sidebar:
     else:
         api_key = st.text_input("🔑 API Key", type="password")
 
-# --- 4. MODUS-AUSWAHL ---
+# --- 5. HAUPTBEREICH (Mobile Friendly) ---
 if st.session_state.mode is None:
     st.title("🎛️ TECHNIK-CENTER")
+    
+    # --- MOBILE LÖSUNG: Wochenplan als Ausklapp-Menü ---
+    # Das sehen Handy-User sofort, ohne die Sidebar suchen zu müssen.
+    with st.expander("📅 WOCHENPLAN ANZEIGEN (HIER KLICKEN)", expanded=False):
+        st.markdown("""
+        **DONNERSTAG (Schule):** 17:30 Aufbau | 19:00 Start  
+        **FREITAG (Allnacht):** 22:30 Treffen | 23:30 Start  
+        **SONNTAG (Briefing):** 22:00 Weekly Call
+        """)
+
     st.markdown("##### WÄHLE DEINEN EINSATZBEREICH")
     st.write("---")
     
     col1, col2, col3 = st.columns(3)
     
-    # HIER IST DER TEST: Der Text in den Buttons muss jetzt weiß leuchten auf schwarzem Grund
     with col1:
         st.markdown("**FÜR NEUE TEAMMITGLIEDER**")
         st.caption("Einführung & Basics")
@@ -138,7 +184,7 @@ if st.session_state.mode is None:
 
     st.stop() 
 
-# --- 5. SYSTEM PROMPT ---
+# --- 6. SYSTEM PROMPT ---
 base_knowledge = """
 Du bist der Technik-Bot der "Schule von Tyrannus" (SVT).
 
@@ -214,8 +260,13 @@ elif st.session_state.mode == "training":
 
 final_system_prompt = base_knowledge + "\n" + mode_instruction
 
-# --- 6. CHAT LOGIK ---
+# --- 7. CHAT LOGIK ---
 st.title(f"TECHNIK-BOT: {st.session_state.mode.upper()}")
+
+# Mobile-Friendly Erinnerung auch im Chat-Modus
+if st.session_state.mode == "live":
+     with st.expander("🆘 SCHNELLER NOTFALL-PLAN (STROM)", expanded=False):
+         st.warning("AN: Mixer -> Boxen | AUS: Boxen -> Mixer")
 
 if api_key:
     genai.configure(api_key=api_key)
