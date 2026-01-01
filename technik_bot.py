@@ -8,62 +8,58 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- SVT DESIGN SYSTEM (MINIMALIST BLACK & WHITE) ---
+# --- SVT DESIGN SYSTEM (FIX: KONTRAST ERZWINGEN) ---
 st.markdown("""
     <style>
-    /* Globales Design: Clean & White */
+    /* 1. GRUNDLAGE: Zwinge alles auf Weißer Hintergrund, Schwarze Schrift */
     .stApp {
-        background-color: #ffffff;
-        color: #000000;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    }
-
-    /* Sidebar: Ein sehr helles Grau für subtile Trennung */
-    section[data-testid="stSidebar"] {
-        background-color: #f8f9fa; /* Sehr helles Grau */
-        border-right: 1px solid #e0e0e0;
-    }
-
-    /* Überschriften: Schwarz & Fett (Wie auf der Webseite) */
-    h1, h2, h3 {
-        color: #000000 !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.5px;
+        background-color: #ffffff !important;
     }
     
-    /* Buttons: Schwarz mit weißer Schrift (High-End Look) */
+    /* 2. TEXT-FARBE ERZWINGEN (Damit Dark-Mode nicht "Weiß auf Weiß" macht) */
+    p, h1, h2, h3, h4, h5, h6, li, span, div, label, .stMarkdown {
+        color: #000000 !important; 
+    }
+
+    /* 3. SIDEBAR SPEZIFISCH */
+    section[data-testid="stSidebar"] {
+        background-color: #f4f4f4 !important; /* Helles Grau zur Abhebung */
+        border-right: 1px solid #ddd;
+    }
+    /* Alle Texte in der Sidebar explizit Schwarz */
+    section[data-testid="stSidebar"] * {
+        color: #1c1c1c !important;
+    }
+
+    /* 4. BUTTONS (SVT Look: Schwarz mit weißem Text) */
     .stButton>button {
         background-color: #000000 !important;
-        color: #ffffff !important;
-        border-radius: 4px !important; /* Etwas eckiger, moderner */
-        border: 1px solid #000000 !important;
-        font-weight: 600 !important;
-        text-transform: uppercase; /* Großbuchstaben wie auf der Website */
+        color: #ffffff !important; /* Hier Text WEISS erzwingen */
+        border-radius: 4px !important;
+        border: 2px solid #000000 !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 0.5rem 1rem;
-        transition: all 0.2s ease;
     }
-    
-    /* Button Hover-Effekt: Invertieren (Weiß mit schwarzem Rand) */
+    /* Hover Effekt: Weiß mit schwarzem Text */
     .stButton>button:hover {
         background-color: #ffffff !important;
         color: #000000 !important;
-        border: 1px solid #000000 !important;
+        border: 2px solid #000000 !important;
     }
 
-    /* Infoboxen & Nachrichten clean halten */
-    .stChatMessage {
-        background-color: #f4f4f4;
-        border-radius: 8px;
-        border: none;
-        color: #000000;
+    /* 5. INPUT FELDER (Damit man sieht, was man tippt) */
+    .stTextInput input {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #ccc !important;
     }
-    
-    /* Statusmeldungen (Info/Success/Error) dezenter machen */
-    .stAlert {
-        background-color: #f8f9fa;
-        color: #000000;
-        border: 1px solid #e0e0e0;
+
+    /* 6. CHAT BUBBLES */
+    .stChatMessage {
+        background-color: #f0f0f0 !important;
+        color: #000000 !important;
+        border: 1px solid #eee;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -75,13 +71,11 @@ if "mode" not in st.session_state:
 # --- 3. SIDEBAR ---
 with st.sidebar:
     try:
-        # Logo
         st.image("svt_logo.jpg", use_container_width=True)
     except:
-        # Fallback Text (Schwarz)
-        st.markdown("<h2 style='text-align: center; color: black;'>SVT TECHNIK</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center;'>SVT TECHNIK</h2>", unsafe_allow_html=True)
     
-    st.markdown("### 📅 WOCHENPLAN") # Uppercase für Style
+    st.markdown("### 📅 WOCHENPLAN")
     st.markdown("""
     **DO (Schule)**
     17:30 Aufbau | 19:00 Start
@@ -94,17 +88,15 @@ with st.sidebar:
     """)
     st.divider()
     
-    # Reset Button
     if st.session_state.mode:
         if st.button("🔄 ZURÜCK"):
             st.session_state.mode = None
             st.session_state.messages = []
             st.rerun()
 
-    # API Key
     if "GOOGLE_API_KEY" in st.secrets:
         api_key = st.secrets["GOOGLE_API_KEY"]
-        st.markdown("<small style='color: grey;'>● System Online</small>", unsafe_allow_html=True)
+        st.markdown("<small>● System Online</small>", unsafe_allow_html=True)
     else:
         api_key = st.text_input("🔑 API Key", type="password")
 
@@ -139,7 +131,7 @@ if st.session_state.mode is None:
 
     st.stop() 
 
-# --- 5. SYSTEM PROMPT (Inhaltlich unverändert & geprüft) ---
+# --- 5. SYSTEM PROMPT ---
 
 base_knowledge = """
 Du bist der Technik-Bot der "Schule von Tyrannus" (SVT).
@@ -222,7 +214,7 @@ st.title(f"TECHNIK-BOT: {st.session_state.mode.upper()}")
 if api_key:
     genai.configure(api_key=api_key)
     
-    # KORREKTES MODELL (Latest, da Stabil)
+    # KORREKTES MODELL: gemini-flash-latest (Wichtig für API Stabilität)
     model = genai.GenerativeModel(
         model_name="gemini-flash-latest", 
         system_instruction=final_system_prompt
