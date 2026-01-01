@@ -8,16 +8,17 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- SVT DESIGN SYSTEM (FIX: BUTTON TEXT FARBE) ---
+# --- SVT DESIGN SYSTEM (FIX: BUTTON TEXT EXTREM FORCIEREN) ---
 st.markdown("""
     <style>
-    /* 1. GRUNDLAGE: Zwinge alles auf Weißer Hintergrund, Schwarze Schrift */
+    /* 1. GRUNDLAGE: Zwinge alles auf Weißer Hintergrund */
     .stApp {
         background-color: #ffffff !important;
     }
     
-    /* 2. TEXT-FARBE ERZWINGEN */
-    p, h1, h2, h3, h4, h5, h6, li, span, div, label, .stMarkdown {
+    /* 2. GLOBALE TEXT-FARBE: SCHWARZ (Das ist die Regel, die Probleme machte) */
+    /* Wir wenden das auf den Haupt-Content an, aber schließen Buttons aus */
+    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp li, .stApp span, .stApp div, .stApp label, .stMarkdown {
         color: #000000 !important; 
     }
 
@@ -30,31 +31,37 @@ st.markdown("""
         color: #1c1c1c !important;
     }
 
-    /* 4. BUTTONS (FIX: TEXT IMMER WEISS) */
-    .stButton>button {
+    /* 4. BUTTONS - DER WICHTIGE FIX */
+    /* Container Styling */
+    .stButton > button {
         background-color: #000000 !important;
-        color: #ffffff !important; /* HIER IST DER FIX: Text IMMER Weiß */
+        border: 2px solid #000000 !important;
         border-radius: 4px !important;
-        border: 2px solid #000000 !important;
-        font-weight: 700 !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    /* Hover Effekt: Weiß mit schwarzem Text */
-    .stButton>button:hover {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border: 2px solid #000000 !important;
     }
 
-    /* 5. INPUT FELDER */
+    /* TEXT IM BUTTON: Zwinge JEDES Element im Button auf WEISS */
+    .stButton > button * {
+        color: #ffffff !important; 
+        font-weight: 700 !important;
+        text-transform: uppercase;
+    }
+    
+    /* HOVER EFFEKT: Invertieren */
+    .stButton > button:hover {
+        background-color: #ffffff !important;
+        border: 2px solid #000000 !important;
+    }
+    /* Beim Hovern muss der Text SCHWARZ werden */
+    .stButton > button:hover * {
+        color: #000000 !important;
+    }
+
+    /* 5. INPUT FELDER & CHAT */
     .stTextInput input {
         color: #000000 !important;
         background-color: #ffffff !important;
         border: 1px solid #ccc !important;
     }
-
-    /* 6. CHAT BUBBLES */
     .stChatMessage {
         background-color: #f0f0f0 !important;
         color: #000000 !important;
@@ -107,10 +114,10 @@ if st.session_state.mode is None:
     
     col1, col2, col3 = st.columns(3)
     
+    # HIER IST DER TEST: Der Text in den Buttons muss jetzt weiß leuchten auf schwarzem Grund
     with col1:
         st.markdown("**FÜR NEUE TEAMMITGLIEDER**")
         st.caption("Einführung & Basics")
-        # Hier wird der Text "🚀 ONBOARDING STARTEN" jetzt immer weiß sein
         if st.button("🚀 ONBOARDING STARTEN", use_container_width=True):
             st.session_state.mode = "onboarding"
             st.rerun()
@@ -213,7 +220,6 @@ st.title(f"TECHNIK-BOT: {st.session_state.mode.upper()}")
 if api_key:
     genai.configure(api_key=api_key)
     
-    # KORREKTES MODELL: gemini-flash-latest (Wichtig für API Stabilität)
     model = genai.GenerativeModel(
         model_name="gemini-flash-latest", 
         system_instruction=final_system_prompt
