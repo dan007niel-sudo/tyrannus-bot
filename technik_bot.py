@@ -11,7 +11,7 @@ if "mode" not in st.session_state:
 # --- 3. SIDEBAR ---
 with st.sidebar:
     try:
-        # Check ob Logo existiert, sonst Warnung statt Absturz
+        # Check ob Logo existiert
         st.image("svt_logo.jpg", use_container_width=True)
     except:
         st.warning("⚠️ Datei 'svt_logo.jpg' fehlt im Ordner.")
@@ -158,7 +158,13 @@ st.title(f"Technik-Bot: {st.session_state.mode.upper()}")
 if api_key:
     # Konfiguration
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel(model_name="gemini-1.5-flash", system_instruction=final_system_prompt)
+    
+    # WICHTIG: Verwende 'gemini-flash-latest', da API-Keys versionsabhängig sein können.
+    # Dies ist die stabilste Einstellung für diesen Account.
+    model = genai.GenerativeModel(
+        model_name="gemini-flash-latest", 
+        system_instruction=final_system_prompt
+    )
 
     # Initiale Nachricht (Nur beim ersten Start des Modus)
     if "messages" not in st.session_state or len(st.session_state.messages) == 0:
@@ -182,7 +188,7 @@ if api_key:
         st.chat_message("user").write(prompt)
         st.session_state.messages.append({"role": "user", "parts": [prompt]})
         
-        # 2. History für API vorbereiten (System-Prompt wird automatisch durch model-init gehändelt)
+        # 2. History für API vorbereiten
         history = [{"role": m["role"], "parts": m["parts"]} for m in st.session_state.messages if m["role"] != "system"]
         
         # 3. API Anfrage
