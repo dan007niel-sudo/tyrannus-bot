@@ -138,22 +138,23 @@ if st.session_state.mode is None:
     
     col1, col2, col3 = st.columns(3)
     
+    # HIER SIND DIE GEKÜRZTEN ÜBERSCHRIFTEN FÜR PERFEKTE AUSRICHTUNG
     with col1:
-        st.markdown("**FÜR NEUE TEAMMITGLIEDER**")
+        st.markdown("**ONBOARDING**")
         st.caption("Einführung & Basics")
         if st.button("🚀 ONBOARDING STARTEN", use_container_width=True):
             st.session_state.mode = "onboarding"
             st.rerun()
             
     with col2:
-        st.markdown("**WÄHREND DER VERANSTALTUNG**")
+        st.markdown("**LIVE-SUPPORT**")
         st.caption("Schnelle Lösungen")
         if st.button("🔥 LIVE-SUPPORT", use_container_width=True):
             st.session_state.mode = "live"
             st.rerun()
             
     with col3:
-        st.markdown("**LERNEN & VERSTEHEN**")
+        st.markdown("**TRAINING**")
         st.caption("Deep Dives & Wissen")
         if st.button("🎓 SCHULUNG", use_container_width=True):
             st.session_state.mode = "training"
