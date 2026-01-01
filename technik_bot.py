@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- SVT DESIGN SYSTEM (FIX: KONTRAST ERZWINGEN) ---
+# --- SVT DESIGN SYSTEM (FIX: BUTTON TEXT FARBE) ---
 st.markdown("""
     <style>
     /* 1. GRUNDLAGE: Zwinge alles auf Weißer Hintergrund, Schwarze Schrift */
@@ -16,25 +16,24 @@ st.markdown("""
         background-color: #ffffff !important;
     }
     
-    /* 2. TEXT-FARBE ERZWINGEN (Damit Dark-Mode nicht "Weiß auf Weiß" macht) */
+    /* 2. TEXT-FARBE ERZWINGEN */
     p, h1, h2, h3, h4, h5, h6, li, span, div, label, .stMarkdown {
         color: #000000 !important; 
     }
 
     /* 3. SIDEBAR SPEZIFISCH */
     section[data-testid="stSidebar"] {
-        background-color: #f4f4f4 !important; /* Helles Grau zur Abhebung */
+        background-color: #f4f4f4 !important;
         border-right: 1px solid #ddd;
     }
-    /* Alle Texte in der Sidebar explizit Schwarz */
     section[data-testid="stSidebar"] * {
         color: #1c1c1c !important;
     }
 
-    /* 4. BUTTONS (SVT Look: Schwarz mit weißem Text) */
+    /* 4. BUTTONS (FIX: TEXT IMMER WEISS) */
     .stButton>button {
         background-color: #000000 !important;
-        color: #ffffff !important; /* Hier Text WEISS erzwingen */
+        color: #ffffff !important; /* HIER IST DER FIX: Text IMMER Weiß */
         border-radius: 4px !important;
         border: 2px solid #000000 !important;
         font-weight: 700 !important;
@@ -48,7 +47,7 @@ st.markdown("""
         border: 2px solid #000000 !important;
     }
 
-    /* 5. INPUT FELDER (Damit man sieht, was man tippt) */
+    /* 5. INPUT FELDER */
     .stTextInput input {
         color: #000000 !important;
         background-color: #ffffff !important;
@@ -111,6 +110,7 @@ if st.session_state.mode is None:
     with col1:
         st.markdown("**FÜR NEUE TEAMMITGLIEDER**")
         st.caption("Einführung & Basics")
+        # Hier wird der Text "🚀 ONBOARDING STARTEN" jetzt immer weiß sein
         if st.button("🚀 ONBOARDING STARTEN", use_container_width=True):
             st.session_state.mode = "onboarding"
             st.rerun()
@@ -132,7 +132,6 @@ if st.session_state.mode is None:
     st.stop() 
 
 # --- 5. SYSTEM PROMPT ---
-
 base_knowledge = """
 Du bist der Technik-Bot der "Schule von Tyrannus" (SVT).
 
