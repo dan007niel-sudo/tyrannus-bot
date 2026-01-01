@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- SVT DESIGN SYSTEM (MOBILE OPTIMIZED) ---
+# --- SVT DESIGN SYSTEM (NOTFALL-FIX: BUTTON TEXT FARBE) ---
 st.markdown("""
     <style>
     /* 1. GRUNDLAGE: Zwinge alles auf Weißer Hintergrund */
@@ -16,7 +16,7 @@ st.markdown("""
         background-color: #ffffff !important;
     }
     
-    /* 2. TEXT-FARBE & SCHRIFT */
+    /* 2. TEXT-FARBE & SCHRIFT (Global, außer Buttons) */
     .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp li, .stApp span, .stApp div, .stApp label, .stMarkdown {
         color: #000000 !important; 
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
@@ -31,14 +31,16 @@ st.markdown("""
         color: #1c1c1c !important;
     }
 
-    /* 4. BUTTONS (WEISSER TEXT AUF SCHWARZ) */
+    /* 4. BUTTONS (DER FIX: TEXT MIT VORSCHLAGHAMMER AUF WEISS) */
     .stButton > button {
         background-color: #000000 !important;
         border: 2px solid #000000 !important;
         border-radius: 4px !important;
         transition: all 0.2s ease;
+        /* HIER IST DER FIX: Farbe für den Button selbst setzen */
+        color: #ffffff !important; 
     }
-    /* Zwinge Text im Button auf Weiß */
+    /* UND HIER NOCHMAL: Zwinge JEDES Element im Button auf WEISS */
     .stButton > button * {
         color: #ffffff !important; 
         font-weight: 700 !important;
@@ -46,21 +48,20 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    /* Hover: Invertieren */
+    /* Hover: Invertieren (Schwarz auf Weiß) */
     .stButton > button:hover {
         background-color: #ffffff !important;
         border: 2px solid #000000 !important;
+        color: #000000 !important;
     }
     .stButton > button:hover * {
         color: #000000 !important;
     }
 
-    /* 5. EXPANDER (Mobile Wochenplan Styling) */
+    /* 5. EXPANDER & INPUTS */
     .streamlit-expanderHeader {
         background-color: #f4f4f4 !important;
         color: #000000 !important;
-        border-radius: 4px;
-        font-weight: bold;
         border: 1px solid #ddd;
     }
     .streamlit-expanderContent {
@@ -68,8 +69,6 @@ st.markdown("""
         border: 1px solid #ddd;
         border-top: none;
     }
-
-    /* 6. INPUT & CHAT */
     .stTextInput input {
         color: #000000 !important;
         background-color: #ffffff !important;
@@ -148,7 +147,6 @@ if st.session_state.mode is None:
     st.title("🎛️ TECHNIK-CENTER")
     
     # --- MOBILE LÖSUNG: Wochenplan als Ausklapp-Menü ---
-    # Das sehen Handy-User sofort, ohne die Sidebar suchen zu müssen.
     with st.expander("📅 WOCHENPLAN ANZEIGEN (HIER KLICKEN)", expanded=False):
         st.markdown("""
         **DONNERSTAG (Schule):** 17:30 Aufbau | 19:00 Start  
@@ -263,7 +261,6 @@ final_system_prompt = base_knowledge + "\n" + mode_instruction
 # --- 7. CHAT LOGIK ---
 st.title(f"TECHNIK-BOT: {st.session_state.mode.upper()}")
 
-# Mobile-Friendly Erinnerung auch im Chat-Modus
 if st.session_state.mode == "live":
      with st.expander("🆘 SCHNELLER NOTFALL-PLAN (STROM)", expanded=False):
          st.warning("AN: Mixer -> Boxen | AUS: Boxen -> Mixer")
