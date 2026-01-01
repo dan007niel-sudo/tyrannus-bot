@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- SVT DESIGN SYSTEM (FINAL & BUGFIXED) ---
+# --- SVT DESIGN SYSTEM (FIXED: KEINE GEISTER-TEXTE MEHR) ---
 st.markdown("""
     <style>
     /* 1. GRUNDLAGE: Weißer Hintergrund */
@@ -16,9 +16,10 @@ st.markdown("""
         background-color: #ffffff !important;
     }
     
-    /* 2. TEXT-FARBE (Global Schwarz) */
-    /* Wir setzen Text global auf Schwarz, aber schließen Icons aus */
-    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp li, .stApp span, .stApp div, .stApp label, .stMarkdown {
+    /* 2. TEXT-FARBE (PRÄZISE DEFINIERT) */
+    /* HIER WAR DER FEHLER: "div" und "span" wurden entfernt! */
+    /* Wir färben nur echten Lesetext schwarz, keine System-Icons */
+    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp li, .stMarkdown, .stTextInput label {
         color: #000000 !important; 
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
     }
@@ -28,7 +29,8 @@ st.markdown("""
         background-color: #f4f4f4 !important;
         border-right: 1px solid #ddd;
     }
-    section[data-testid="stSidebar"] * {
+    /* In der Sidebar sind wir etwas aggressiver, da dort kaum Icons sind */
+    section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] div, section[data-testid="stSidebar"] span {
         color: #1c1c1c !important;
     }
 
@@ -40,7 +42,7 @@ st.markdown("""
         transition: all 0.2s ease;
     }
     
-    /* WICHTIG: Text im Button MUSS weiß sein */
+    /* Text im Button weiß erzwingen */
     .stButton > button * {
         color: #ffffff !important;
         font-weight: 700 !important;
@@ -48,7 +50,7 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    /* Hover: Invertieren (Weißer Button, Schwarzer Text) */
+    /* Hover: Invertieren */
     .stButton > button:hover {
         background-color: #ffffff !important;
         border: 2px solid #000000 !important;
@@ -64,7 +66,7 @@ st.markdown("""
         border: 1px solid #ccc !important;
     }
     
-    /* HIER WAR DER FIX: Keine erzwungene Textfarbe, damit Icons funktionieren */
+    /* Chat Nachricht: Hintergrund grau, aber TEXTFARBE NICHT ERZWINGEN */
     .stChatMessage {
         background-color: #f8f9fa !important;
         border: 1px solid #e0e0e0;
@@ -140,7 +142,7 @@ if st.session_state.mode is None:
     
     col1, col2, col3 = st.columns(3)
     
-    # HIER SIND DIE GEKÜRZTEN ÜBERSCHRIFTEN FÜR PERFEKTE AUSRICHTUNG
+    # Gekürzte Überschriften (Buttons auf einer Linie)
     with col1:
         st.markdown("**ONBOARDING**")
         st.caption("Einführung & Basics")
@@ -246,7 +248,7 @@ st.title(f"TECHNIK-BOT: {st.session_state.mode.upper()}")
 if api_key:
     genai.configure(api_key=api_key)
     
-    # WICHTIG: Verwende 'gemini-flash-latest' für Stabilität
+    # WICHTIG: 'gemini-flash-latest' für Stabilität
     model = genai.GenerativeModel(
         model_name="gemini-flash-latest", 
         system_instruction=final_system_prompt
