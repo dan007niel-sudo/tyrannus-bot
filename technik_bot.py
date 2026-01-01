@@ -1,8 +1,72 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- 1. KONFIGURATION ---
-st.set_page_config(page_title="Tyrannus Technik-Bot", page_icon="🎛️", layout="wide")
+# --- 1. KONFIGURATION & DESIGN ---
+st.set_page_config(
+    page_title="Tyrannus Technik-Bot",
+    page_icon="🎛️",
+    layout="wide"
+)
+
+# --- SVT DESIGN SYSTEM (MINIMALIST BLACK & WHITE) ---
+st.markdown("""
+    <style>
+    /* Globales Design: Clean & White */
+    .stApp {
+        background-color: #ffffff;
+        color: #000000;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    /* Sidebar: Ein sehr helles Grau für subtile Trennung */
+    section[data-testid="stSidebar"] {
+        background-color: #f8f9fa; /* Sehr helles Grau */
+        border-right: 1px solid #e0e0e0;
+    }
+
+    /* Überschriften: Schwarz & Fett (Wie auf der Webseite) */
+    h1, h2, h3 {
+        color: #000000 !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.5px;
+    }
+    
+    /* Buttons: Schwarz mit weißer Schrift (High-End Look) */
+    .stButton>button {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border-radius: 4px !important; /* Etwas eckiger, moderner */
+        border: 1px solid #000000 !important;
+        font-weight: 600 !important;
+        text-transform: uppercase; /* Großbuchstaben wie auf der Website */
+        letter-spacing: 1px;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    /* Button Hover-Effekt: Invertieren (Weiß mit schwarzem Rand) */
+    .stButton>button:hover {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+    }
+
+    /* Infoboxen & Nachrichten clean halten */
+    .stChatMessage {
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        border: none;
+        color: #000000;
+    }
+    
+    /* Statusmeldungen (Info/Success/Error) dezenter machen */
+    .stAlert {
+        background-color: #f8f9fa;
+        color: #000000;
+        border: 1px solid #e0e0e0;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # --- 2. SESSION STATE INIT ---
 if "mode" not in st.session_state:
@@ -11,12 +75,13 @@ if "mode" not in st.session_state:
 # --- 3. SIDEBAR ---
 with st.sidebar:
     try:
-        # Check ob Logo existiert
+        # Logo
         st.image("svt_logo.jpg", use_container_width=True)
     except:
-        st.warning("⚠️ Datei 'svt_logo.jpg' fehlt im Ordner.")
+        # Fallback Text (Schwarz)
+        st.markdown("<h2 style='text-align: center; color: black;'>SVT TECHNIK</h2>", unsafe_allow_html=True)
     
-    st.header("📅 Wochenplan")
+    st.markdown("### 📅 WOCHENPLAN") # Uppercase für Style
     st.markdown("""
     **DO (Schule)**
     17:30 Aufbau | 19:00 Start
@@ -29,52 +94,52 @@ with st.sidebar:
     """)
     st.divider()
     
-    # Reset Button (Um Modus zu wechseln)
+    # Reset Button
     if st.session_state.mode:
-        if st.button("🔄 Modus wechseln"):
+        if st.button("🔄 ZURÜCK"):
             st.session_state.mode = None
             st.session_state.messages = []
             st.rerun()
 
-    # API Key Handling
+    # API Key
     if "GOOGLE_API_KEY" in st.secrets:
         api_key = st.secrets["GOOGLE_API_KEY"]
-        st.success("System: Online 🟢")
+        st.markdown("<small style='color: grey;'>● System Online</small>", unsafe_allow_html=True)
     else:
-        api_key = st.text_input("🔑 Google API Key", type="password")
+        api_key = st.text_input("🔑 API Key", type="password")
 
 # --- 4. MODUS-AUSWAHL ---
 if st.session_state.mode is None:
-    st.title("🎛️ Tyrannus Technik-Center")
-    st.write("### Wähle deinen Einsatzbereich:")
+    st.title("🎛️ TECHNIK-CENTER")
+    st.markdown("##### WÄHLE DEINEN EINSATZBEREICH")
     st.write("---")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.info("**Für neue Teammitglieder**")
-        st.markdown("_Ich führe dich Schritt-für-Schritt ins Team und die Technik ein._")
-        if st.button("🚀 Onboarding Starten", use_container_width=True):
+        st.markdown("**FÜR NEUE TEAMMITGLIEDER**")
+        st.caption("Einführung & Basics")
+        if st.button("🚀 ONBOARDING STARTEN", use_container_width=True):
             st.session_state.mode = "onboarding"
             st.rerun()
             
     with col2:
-        st.error("**Während der Veranstaltung**")
-        st.markdown("_Ich liefere dir sofortige Lösungen, wenn es brennt – ohne Gelaber._")
-        if st.button("🔥 Live-Support (Notfall)", use_container_width=True):
+        st.markdown("**WÄHREND DER VERANSTALTUNG**")
+        st.caption("Schnelle Lösungen")
+        if st.button("🔥 LIVE-SUPPORT", use_container_width=True):
             st.session_state.mode = "live"
             st.rerun()
             
     with col3:
-        st.success("**Lernen & Verstehen**")
-        st.markdown("_Ich erkläre dir Zusammenhänge und mache dich zum Profi._")
-        if st.button("🎓 Schulung / Deep Dive", use_container_width=True):
+        st.markdown("**LERNEN & VERSTEHEN**")
+        st.caption("Deep Dives & Wissen")
+        if st.button("🎓 SCHULUNG", use_container_width=True):
             st.session_state.mode = "training"
             st.rerun()
 
-    st.stop() # Stoppt hier, bis ein Button gedrückt wird
+    st.stop() 
 
-# --- 5. SYSTEM PROMPT (DAS GEHIRN) ---
+# --- 5. SYSTEM PROMPT (Inhaltlich unverändert & geprüft) ---
 
 base_knowledge = """
 Du bist der Technik-Bot der "Schule von Tyrannus" (SVT).
@@ -127,7 +192,6 @@ MASTER-WORKFLOW & PROTOKOLLE:
 - Ordnung: Batterien raus, Mikros reinigen, Kabel ordentlich wickeln.
 """
 
-# Dynamische Anweisungen je nach Modus
 if st.session_state.mode == "onboarding":
     mode_instruction = """
     MODUS: ONBOARDING.
@@ -153,20 +217,17 @@ elif st.session_state.mode == "training":
 final_system_prompt = base_knowledge + "\n" + mode_instruction
 
 # --- 6. CHAT LOGIK ---
-st.title(f"Technik-Bot: {st.session_state.mode.upper()}")
+st.title(f"TECHNIK-BOT: {st.session_state.mode.upper()}")
 
 if api_key:
-    # Konfiguration
     genai.configure(api_key=api_key)
     
-    # WICHTIG: Verwende 'gemini-flash-latest', da API-Keys versionsabhängig sein können.
-    # Dies ist die stabilste Einstellung für diesen Account.
+    # KORREKTES MODELL (Latest, da Stabil)
     model = genai.GenerativeModel(
         model_name="gemini-flash-latest", 
         system_instruction=final_system_prompt
     )
 
-    # Initiale Nachricht (Nur beim ersten Start des Modus)
     if "messages" not in st.session_state or len(st.session_state.messages) == 0:
         st.session_state.messages = []
         if st.session_state.mode == "onboarding":
@@ -177,29 +238,21 @@ if api_key:
             welcome = "Schulung bereit. Welches Thema aus dem Workflow wollen wir vertiefen?"
         st.session_state.messages.append({"role": "model", "parts": [welcome]})
 
-    # Chat Verlauf anzeigen
     for message in st.session_state.messages:
         with st.chat_message("user" if message["role"] == "user" else "assistant"):
             st.write(message["parts"][0])
 
-    # User Input verarbeiten
     if prompt := st.chat_input("Eingabe..."):
-        # 1. User Input anzeigen
         st.chat_message("user").write(prompt)
         st.session_state.messages.append({"role": "user", "parts": [prompt]})
         
-        # 2. History für API vorbereiten
         history = [{"role": m["role"], "parts": m["parts"]} for m in st.session_state.messages if m["role"] != "system"]
         
-        # 3. API Anfrage
         try:
-            # history[:-1] nimmt alles außer dem gerade getippten Prompt als Kontext
             chat = model.start_chat(history=history[:-1])
-            
-            with st.spinner("Verarbeite..."):
+            with st.spinner("..."):
                 response = chat.send_message(prompt)
             
-            # 4. Antwort anzeigen
             st.chat_message("assistant").write(response.text)
             st.session_state.messages.append({"role": "model", "parts": [response.text]})
             
